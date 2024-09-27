@@ -1,15 +1,14 @@
 // src/services/nasaApi.js
 import axios from 'axios';
 
-const NASA_API_KEY = 'TU_API_KEY_AQUI';
-const BASE_URL = 'https://api.nasa.gov/neo/rest/v1/neo/browse';
+const apiUrl = 'http://localhost:5000/api/planet';
 
-export const fetchNearEarthObjects = async () => {
+export const getPlanetData = async (planetName) => {
   try {
-    const response = await axios.get(`${BASE_URL}?api_key=${NASA_API_KEY}`);
+    const response = await axios.get(`${apiUrl}/${planetName}`);
     return response.data;
   } catch (error) {
-    console.error('Error al obtener los datos de la API de la NASA:', error);
-    return null;
+    console.error(`Error fetching ${planetName} data:`, error);
+    throw error;
   }
 };

@@ -1,49 +1,42 @@
 import React, { useEffect } from 'react';
 import * as THREE from 'three';
+import axios from 'axios';
 
 const SolarSystem = () => {
   useEffect(() => {
-    
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('solar-system-canvas').appendChild(renderer.domElement);
+    document.body.appendChild(renderer.domElement);
 
-    
-    const sunGeometry = new THREE.SphereGeometry(2, 32, 32);
-    const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+    const geometry = new THREE.SphereGeometry(1, 32, 32);
+    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const sun = new THREE.Mesh(geometry, material);
     scene.add(sun);
 
-    
-    const earthGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const earthMaterial = new THREE.MeshBasicMaterial({ color: 0x0077ff });
-    const earth = new THREE.Mesh(earthGeometry, earthMaterial);
-    earth.position.set(5, 0, 0);  
-    scene.add(earth);
+    camera.position.z = 5;
 
-    camera.position.z = 10;
-
-    
     const animate = () => {
       requestAnimationFrame(animate);
-      
-      
-      earth.rotation.y += 0.01;
-      earth.position.x = 5 * Math.cos(Date.now() * 0.001);  // Movimiento circular simple
-      earth.position.z = 5 * Math.sin(Date.now() * 0.001);
-
+      sun.rotation.y += 0.01;
       renderer.render(scene, camera);
     };
     animate();
+
+    const fetchPlanetData = async () => {
+      try {
+        const response = await axios.get('http://localhost:5000/api/planet/earth');
+        console.log('Datos de la Tierra:', response.data);
+      } catch (error) {
+        console.error('Error al obtener datos del planeta:', error);
+      }
+    };
+
+    fetchPlanetData();
   }, []);
 
-  return (
-    <div className="solar-system">
-      <div id="solar-system-canvas"></div>
-    </div>
-  );
+  return <div id="solar-system" style={{ width: '100%', height: '100%' }}></div>;
 };
 
 export default SolarSystem;
