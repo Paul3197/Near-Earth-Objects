@@ -1,4 +1,4 @@
 [build]
   base = "frontend"                   # La carpeta donde está tu package.json
-  publish = "frontend/build"          # La carpeta generada por React después de la construcción
+  publish = "build"          # La carpeta generada por React después de la construcción
   command = "npm install && npm run build"  # Comando de construcción
