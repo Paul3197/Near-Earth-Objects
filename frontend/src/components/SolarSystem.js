@@ -1,42 +1,44 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Importar texturas
-import mercuryImg from '../assets/img/mercury.jpg';
-import venusImg from '../assets/img/venus.jpg';
-import earthImg from '../assets/img/earth_dy.jpg';
-import marsImg from '../assets/img/marte.jpg';
-import jupiterImg from '../assets/img/jupiter.jpg';
-import saturnImg from '../assets/img/saturn.jpg';
-import uranusImg from '../assets/img/urano.jpg';
-import neptuneImg from '../assets/img/neptune.jpg';
-import ringImg from '../assets/img/ring.png';
-import sunImg from '../assets/img/sun.jpg'; // Importar la textura del sol
+import mercuryImg from './img/mercury.jpg';
+import venusImg from './img/venus.jpg';
+import earthImg from './img/earth_dy.jpg';
+import marsImg from './img/marte.jpg';
+import jupiterImg from './img/jupiter.jpg';
+import saturnImg from './img/saturn.jpg';
+import uranusImg from './img/urano.jpg';
+import neptuneImg from './img/neptune.jpg';
+import ringImg from './img/ring.png';
+import sunImg from './img/sun.jpg'; // Importar la textura del sol
 
 const SolarSystem = () => {
-  // Aplicar renderizador
   const mountRef = useRef(null);
-  
+
+  // Nuevo estado para controlar la velocidad
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+
   useEffect(() => {
-    // Contenedor de objetos 3D
+    const currentMountRef = mountRef.current; // Almacenar el valor actual de mountRef
+
     const scene = new THREE.Scene();
-    // Campo de vision de 75º
+
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    mountRef.current.appendChild(renderer.domElement);
+    currentMountRef.appendChild(renderer.domElement);
 
-    // Interaccion en 3D
     const controls = new OrbitControls(camera, renderer.domElement);
 
     // Crear fondo estrellado
     const starGeometry = new THREE.BufferGeometry();
-    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
 
     const starVertices = [];
     for (let i = 0; i < 10000; i++) {
-      const x = THREE.MathUtils.randFloatSpread(2000); 
+      const x = THREE.MathUtils.randFloatSpread(2000);
       const y = THREE.MathUtils.randFloatSpread(2000);
       const z = THREE.MathUtils.randFloatSpread(2000);
       starVertices.push(x, y, z);
@@ -47,7 +49,7 @@ const SolarSystem = () => {
     scene.add(stars);
 
     // Crear el sol con textura
-    const geometrySun = new THREE.SphereGeometry(5, 32, 32);
+    const geometrySun = new THREE.SphereGeometry(6, 6970, 32, 32);
     const textureLoader = new THREE.TextureLoader();
     const materialSun = new THREE.MeshBasicMaterial({ map: textureLoader.load(sunImg) }); // Aplicar textura del sol
     const sun = new THREE.Mesh(geometrySun, materialSun);
@@ -110,8 +112,22 @@ const SolarSystem = () => {
           side: THREE.DoubleSide,
           transparent: true
         });
+
+        // Ajustar las coordenadas UV para que la textura se aplique de manera correcta
+        const uv = ringGeometry.attributes.uv;
+        for (let i = 0; i < uv.count; i++) {
+          const u = uv.getX(i);
+          // Ajustar las coordenadas para que las líneas de la textura se envuelvan correctamente alrededor del anillo
+          const angle = u * Math.PI * 2;
+          const newU = Math.cos(angle) * 0.5 + 0.5; // Convertir coordenadas polares a UV
+          const newV = Math.sin(angle) * 0.5 + 0.5;
+          uv.setXY(i, newU, newV);
+        }
+        uv.needsUpdate = true; // Asegurarse de que las coordenadas UV se actualicen
+
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.rotation.x = THREE.MathUtils.degToRad(90); 
+        ring.rotation.x = THREE.MathUtils.degToRad(90); // Orientar correctamente los anillos
+        ring.userData.rotationSpeed = 0.0005; // Velocidad de rotación más lenta para los anillos
         planet.add(ring);
       }
     });
@@ -122,12 +138,15 @@ const SolarSystem = () => {
       requestAnimationFrame(animate);
 
       planets.forEach(({ mesh, distance, eccentricity, speedFactor }) => {
-        const time = Date.now() * 0.00005 * speedFactor;
+        const time = Date.now() * 0.00005 * speedFactor * speedMultiplier; // Multiplica por el factor de velocidad
         const angle = time % (2 * Math.PI);
         const radiusX = distance * (1 + eccentricity);
         const radiusY = distance * (1 - eccentricity);
         mesh.position.x = radiusX * Math.cos(angle);
         mesh.position.z = radiusY * Math.sin(angle);
+
+        // Rotar planetas sobre su eje
+        mesh.rotation.y += 0.01 * speedMultiplier; // Acelera la rotación en función de la velocidad
       });
 
       controls.update();
@@ -138,13 +157,30 @@ const SolarSystem = () => {
 
     // Limpiar al desmontar
     return () => {
-      mountRef.current.removeChild(renderer.domElement);
+      if (currentMountRef) {
+        currentMountRef.removeChild(renderer.domElement);
+      }
       scene.clear();
       renderer.dispose();
     };
-  }, []);
+  }, [speedMultiplier]); // La animación se actualizará cuando cambie el multiplicador de velocidad
 
-  return <div ref={mountRef} />;
+  return (
+    <div>
+      <div ref={mountRef}></div>
+      <div>
+        <label>Speed Multiplier:</label>
+        <input
+          type="range"
+          min="0.1"
+          max="10"
+          step="0.1"
+          value={speedMultiplier}
+          onChange={e => setSpeedMultiplier(parseFloat(e.target.value))}
+        />
+      </div>
+    </div>
+  );
 };
 
 export default SolarSystem;
