@@ -21,12 +21,14 @@ const SolarSystem = () => {
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
 
   useEffect(() => {
+    const currentMountRef = mountRef.current; // Almacenar el valor actual de mountRef
+
     const scene = new THREE.Scene();
 
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    mountRef.current.appendChild(renderer.domElement);
+    currentMountRef.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
@@ -156,7 +158,9 @@ const SolarSystem = () => {
 
     // Limpiar al desmontar
     return () => {
-      mountRef.current.removeChild(renderer.domElement);
+      if (currentMountRef) {
+        currentMountRef.removeChild(renderer.domElement);
+      }
       scene.clear();
       renderer.dispose();
     };
@@ -164,11 +168,17 @@ const SolarSystem = () => {
 
   return (
     <div>
-      <div ref={mountRef} />
-      <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
-        <button onClick={() => setSpeedMultiplier(1)}>x1</button>
-        <button onClick={() => setSpeedMultiplier(2)}>x2</button>
-        <button onClick={() => setSpeedMultiplier(4)}>x4</button>
+      <div ref={mountRef}></div>
+      <div>
+        <label>Speed Multiplier:</label>
+        <input
+          type="range"
+          min="0.1"
+          max="10"
+          step="0.1"
+          value={speedMultiplier}
+          onChange={e => setSpeedMultiplier(parseFloat(e.target.value))}
+        />
       </div>
     </div>
   );
