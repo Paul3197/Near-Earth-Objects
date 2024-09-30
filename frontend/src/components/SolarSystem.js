@@ -3,33 +3,36 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Importar texturas
-import mercuryImg from './img/mercury.jpg';
-import venusImg from './img/venus.jpg';
-import earthImg from './img/earth_dy.jpg';
-import marsImg from './img/marte.jpg';
-import jupiterImg from './img/jupiter.jpg';
-import saturnImg from './img/saturn.jpg';
-import uranusImg from './img/urano.jpg';
-import neptuneImg from './img/neptune.jpg';
-import ringImg from './img/ring.png';
-import sunImg from './img/sun.jpg'; // Importar la textura del sol
+import mercuryImg from '../assets/img/mercury.jpg';
+import venusImg from '../assets/img/venus.jpg';
+import earthImg from '../assets/img/earth_dy.jpg';
+import marsImg from '../assets/img/marte.jpg';
+import jupiterImg from '../assets/img/jupiter.jpg';
+import saturnImg from '../assets/img/saturn.jpg';
+import uranusImg from '../assets/img/urano.jpg';
+import neptuneImg from '../assets/img/neptune.jpg';
+import ringImg from '../assets/img/ring.png';
+import sunImg from '../assets/img/sun.jpg'; // Importar la textura del sol
 
 const SolarSystem = () => {
+  // Aplicar renderizador
   const mountRef = useRef(null);
-
+  
   useEffect(() => {
+    // Contenedor de objetos 3D
     const scene = new THREE.Scene();
-
+    // Campo de vision de 75º
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     mountRef.current.appendChild(renderer.domElement);
 
+    // Interaccion en 3D
     const controls = new OrbitControls(camera, renderer.domElement);
 
     // Crear fondo estrellado
     const starGeometry = new THREE.BufferGeometry();
-    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
+    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.5 });
 
     const starVertices = [];
     for (let i = 0; i < 10000; i++) {

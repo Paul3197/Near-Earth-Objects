@@ -81,31 +81,40 @@ function extractOrbitalElements(data) {
 }
 
 // Ruta para obtener los cometas
-router.get('/comets', async (req, res) => {
+// Obtener un cometa por su nombre (o cualquier otro campo único)
+router.get('/comets/:name', async (req, res) => {
   try {
     const cometsUrl = 'https://data.nasa.gov/resource/b67r-rgxc.json';
     const response = await axios.get(cometsUrl);
     const cometsData = response.data;
-    const importantComets = cometsData.slice(0, 10);
 
-    const cometElements = importantComets.map(comet => ({
-      name: comet.object_name,
-      epoch_tdb: comet.epoch_tdb,
-      e: comet.e,
-      i_deg: comet.i_deg,
-      w_deg: comet.w_deg,
-      node_deg: comet.node_deg,
-      q_au_1: comet.q_au_1,
-      q_au_2: comet.q_au_2,
-      p_yr: comet.p_yr,
-      moid_au: comet.moid_au
-    }));
+    const cometName = req.params.name;
+    // Buscar el cometa en la lista por su nombre
+    const comet = cometsData.find(c => c.object_name.toLowerCase() === cometName.toLowerCase());
 
-    res.json(cometElements);
+    if (comet) {
+      // Si se encuentra el cometa, devolver sus datos
+      const cometElement = {
+        name: comet.object_name,
+        epoch_tdb: comet.epoch_tdb,
+        e: comet.e,
+        i_deg: comet.i_deg,
+        w_deg: comet.w_deg,
+        node_deg: comet.node_deg,
+        q_au_1: comet.q_au_1,
+        q_au_2: comet.q_au_2,
+        p_yr: comet.p_yr,
+        moid_au: comet.moid_au
+      };
+      res.json(cometElement);
+    } else {
+      res.status(404).json({ error: 'Cometa no encontrado' });
+    }
   } catch (error) {
-    console.error('Error al obtener los datos de los cometas:', error);
-    res.status(500).json({ error: 'No se pudieron obtener los datos de los cometas' });
+    console.error('Error al obtener los datos del cometa:', error);
+    res.status(500).json({ error: 'No se pudo obtener el cometa' });
   }
 });
 
 module.exports = router;
+
