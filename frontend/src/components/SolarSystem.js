@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -17,6 +17,9 @@ import sunImg from './img/sun.jpg'; // Importar la textura del sol
 const SolarSystem = () => {
   const mountRef = useRef(null);
 
+  // Nuevo estado para controlar la velocidad
+  const [speedMultiplier, setSpeedMultiplier] = useState(1);
+
   useEffect(() => {
     const scene = new THREE.Scene();
 
@@ -33,7 +36,7 @@ const SolarSystem = () => {
 
     const starVertices = [];
     for (let i = 0; i < 10000; i++) {
-      const x = THREE.MathUtils.randFloatSpread(2000); 
+      const x = THREE.MathUtils.randFloatSpread(2000);
       const y = THREE.MathUtils.randFloatSpread(2000);
       const z = THREE.MathUtils.randFloatSpread(2000);
       starVertices.push(x, y, z);
@@ -44,7 +47,7 @@ const SolarSystem = () => {
     scene.add(stars);
 
     // Crear el sol con textura
-    const geometrySun = new THREE.SphereGeometry(5, 32, 32);
+    const geometrySun = new THREE.SphereGeometry(6, 6970, 32, 32);
     const textureLoader = new THREE.TextureLoader();
     const materialSun = new THREE.MeshBasicMaterial({ map: textureLoader.load(sunImg) }); // Aplicar textura del sol
     const sun = new THREE.Mesh(geometrySun, materialSun);
@@ -107,8 +110,23 @@ const SolarSystem = () => {
           side: THREE.DoubleSide,
           transparent: true
         });
+
+        // Ajustar las coordenadas UV para que la textura se aplique de manera correcta
+        const uv = ringGeometry.attributes.uv;
+        for (let i = 0; i < uv.count; i++) {
+          const u = uv.getX(i);
+          const v = uv.getY(i);
+          // Ajustar las coordenadas para que las líneas de la textura se envuelvan correctamente alrededor del anillo
+          const angle = u * Math.PI * 2;
+          const newU = Math.cos(angle) * 0.5 + 0.5; // Convertir coordenadas polares a UV
+          const newV = Math.sin(angle) * 0.5 + 0.5;
+          uv.setXY(i, newU, newV);
+        }
+        uv.needsUpdate = true; // Asegurarse de que las coordenadas UV se actualicen
+
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.rotation.x = THREE.MathUtils.degToRad(90); 
+        ring.rotation.x = THREE.MathUtils.degToRad(90); // Orientar correctamente los anillos
+        ring.userData.rotationSpeed = 0.0005; // Velocidad de rotación más lenta para los anillos
         planet.add(ring);
       }
     });
@@ -119,12 +137,15 @@ const SolarSystem = () => {
       requestAnimationFrame(animate);
 
       planets.forEach(({ mesh, distance, eccentricity, speedFactor }) => {
-        const time = Date.now() * 0.00005 * speedFactor;
+        const time = Date.now() * 0.00005 * speedFactor * speedMultiplier; // Multiplica por el factor de velocidad
         const angle = time % (2 * Math.PI);
         const radiusX = distance * (1 + eccentricity);
         const radiusY = distance * (1 - eccentricity);
         mesh.position.x = radiusX * Math.cos(angle);
         mesh.position.z = radiusY * Math.sin(angle);
+
+        // Rotar planetas sobre su eje
+        mesh.rotation.y += 0.01 * speedMultiplier; // Acelera la rotación en función de la velocidad
       });
 
       controls.update();
@@ -139,9 +160,18 @@ const SolarSystem = () => {
       scene.clear();
       renderer.dispose();
     };
-  }, []);
+  }, [speedMultiplier]); // La animación se actualizará cuando cambie el multiplicador de velocidad
 
-  return <div ref={mountRef} />;
+  return (
+    <div>
+      <div ref={mountRef} />
+      <div style={{ position: 'absolute', top: '10px', left: '10px' }}>
+        <button onClick={() => setSpeedMultiplier(1)}>x1</button>
+        <button onClick={() => setSpeedMultiplier(2)}>x2</button>
+        <button onClick={() => setSpeedMultiplier(4)}>x4</button>
+      </div>
+    </div>
+  );
 };
 
 export default SolarSystem;
