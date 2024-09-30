@@ -1,30 +1,17 @@
 import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-
-// Importar texturas
-import mercuryImg from '../img/earth_ng.jpg';
-import venusImg from '../img/venus.jpg';
-import earthImg from '../img/earth_dy.jpg';
-import marsImg from '../img/marte.jpg';
-import jupiterImg from '../img/jupiter.jpg';
-import saturnImg from '../img/saturn.jpg';
-import uranusImg from '../img/urano.jpg';
-import neptuneImg from '../img/neptune.jpg';
-import ringImg from '../img/ring.png';
-import sunImg from '../img/sun.jpg'; // Importar la textura del sol
+import planetsData from './data/planetData'; // Importar los datos de los planetas
+import ringImg from './img/ring.png';
+import sunImg from './img/sun.jpg';
 
 const SolarSystem = () => {
   const mountRef = useRef(null);
-
-  // Nuevo estado para controlar la velocidad
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
 
   useEffect(() => {
-    const currentMountRef = mountRef.current; // Almacenar el valor actual de mountRef
-
+    const currentMountRef = mountRef.current;
     const scene = new THREE.Scene();
-
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -32,10 +19,11 @@ const SolarSystem = () => {
 
     const controls = new OrbitControls(camera, renderer.domElement);
 
+    const textureLoader = new THREE.TextureLoader();
+
     // Crear fondo estrellado
     const starGeometry = new THREE.BufferGeometry();
     const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
-
     const starVertices = [];
     for (let i = 0; i < 10000; i++) {
       const x = THREE.MathUtils.randFloatSpread(2000);
@@ -43,41 +31,25 @@ const SolarSystem = () => {
       const z = THREE.MathUtils.randFloatSpread(2000);
       starVertices.push(x, y, z);
     }
-
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    // Crear el sol con textura
-    const geometrySun = new THREE.SphereGeometry(6, 6970, 32, 32);
-    const textureLoader = new THREE.TextureLoader();
-    const materialSun = new THREE.MeshBasicMaterial({ map: textureLoader.load(sunImg) }); // Aplicar textura del sol
+    // Crear el sol
+    const geometrySun = new THREE.SphereGeometry(3, 32, 32);
+    const materialSun = new THREE.MeshBasicMaterial({ map: textureLoader.load(sunImg) });
     const sun = new THREE.Mesh(geometrySun, materialSun);
     scene.add(sun);
 
-    // Crear una luz puntual que emana desde el Sol con mayor intensidad
-    const sunLight = new THREE.PointLight(0xffffff, 9000, 500); // Luz del sol
-    sunLight.position.set(0, 0, 0); // La luz está en el mismo lugar que el Sol
+    const sunLight = new THREE.PointLight(0xffffff, 900, 500);
+    sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
-
-    // Datos de los planetas con posiciones más realistas
-    const planetsData = [
-      { name: 'Mercury', texture: mercuryImg, size: 0.383, distance: 10, inclination: 7, eccentricity: 0.2056, speedFactor: 1.61 },
-      { name: 'Venus', texture: venusImg, size: 0.949, distance: 15, inclination: 3.39, eccentricity: 0.0067, speedFactor: 1.18 },
-      { name: 'Earth', texture: earthImg, size: 1, distance: 20, inclination: 0, eccentricity: 0.0167, speedFactor: 1.00 },
-      { name: 'Mars', texture: marsImg, size: 0.532, distance: 30, inclination: 1.85, eccentricity: 0.0934, speedFactor: 0.81 },
-      { name: 'Jupiter', texture: jupiterImg, size: 11.21, distance: 50, inclination: 1.31, eccentricity: 0.0489, speedFactor: 0.44 },
-      { name: 'Saturn', texture: saturnImg, size: 9.45, distance: 70, inclination: 2.49, eccentricity: 0.0565, speedFactor: 0.33, hasRings: true },
-      { name: 'Uranus', texture: uranusImg, size: 4.01, distance: 90, inclination: 0.77, eccentricity: 0.0463, speedFactor: 0.23 },
-      { name: 'Neptune', texture: neptuneImg, size: 3.88, distance: 110, inclination: 1.77, eccentricity: 0.0086, speedFactor: 0.18 }
-    ];
 
     const planets = [];
 
-    // Crear los planetas y las órbitas
     planetsData.forEach(planetData => {
       const geometryPlanet = new THREE.SphereGeometry(planetData.size, 32, 32);
-      const materialPlanet = new THREE.MeshPhongMaterial({ 
+      const materialPlanet = new THREE.MeshPhongMaterial({
         map: textureLoader.load(planetData.texture)
       });
       const planet = new THREE.Mesh(geometryPlanet, materialPlanet);
@@ -87,7 +59,7 @@ const SolarSystem = () => {
       scene.add(planet);
       planets.push({ mesh: planet, ...planetData });
 
-      // Crear la órbita del planeta
+      // Crear la órbita
       const curve = new THREE.EllipseCurve(
         0, 0, 
         planetData.distance * (1 + planetData.eccentricity), 
@@ -104,30 +76,27 @@ const SolarSystem = () => {
       orbit.rotation.x = THREE.MathUtils.degToRad(90);
       scene.add(orbit);
 
-      // Crear anillos de Saturno
+      // Añadir anillos de Saturno
       if (planetData.hasRings) {
-        const ringGeometry = new THREE.RingGeometry(11, 15, 64);
+        const ringGeometry = new THREE.RingGeometry(3, 4, 64);
         const ringMaterial = new THREE.MeshBasicMaterial({
           map: textureLoader.load(ringImg), 
           side: THREE.DoubleSide,
           transparent: true
         });
 
-        // Ajustar las coordenadas UV para que la textura se aplique de manera correcta
         const uv = ringGeometry.attributes.uv;
         for (let i = 0; i < uv.count; i++) {
           const u = uv.getX(i);
-          // Ajustar las coordenadas para que las líneas de la textura se envuelvan correctamente alrededor del anillo
           const angle = u * Math.PI * 2;
-          const newU = Math.cos(angle) * 0.5 + 0.5; // Convertir coordenadas polares a UV
+          const newU = Math.cos(angle) * 0.5 + 0.5;
           const newV = Math.sin(angle) * 0.5 + 0.5;
           uv.setXY(i, newU, newV);
         }
-        uv.needsUpdate = true; // Asegurarse de que las coordenadas UV se actualicen
+        uv.needsUpdate = true;
 
         const ring = new THREE.Mesh(ringGeometry, ringMaterial);
-        ring.rotation.x = THREE.MathUtils.degToRad(90); // Orientar correctamente los anillos
-        ring.userData.rotationSpeed = 0.0005; // Velocidad de rotación más lenta para los anillos
+        ring.rotation.x = THREE.MathUtils.degToRad(90);
         planet.add(ring);
       }
     });
@@ -138,15 +107,14 @@ const SolarSystem = () => {
       requestAnimationFrame(animate);
 
       planets.forEach(({ mesh, distance, eccentricity, speedFactor }) => {
-        const time = Date.now() * 0.00005 * speedFactor * speedMultiplier; // Multiplica por el factor de velocidad
+        const time = Date.now() * 0.00005 * speedFactor * speedMultiplier;
         const angle = time % (2 * Math.PI);
         const radiusX = distance * (1 + eccentricity);
         const radiusY = distance * (1 - eccentricity);
         mesh.position.x = radiusX * Math.cos(angle);
         mesh.position.z = radiusY * Math.sin(angle);
 
-        // Rotar planetas sobre su eje
-        mesh.rotation.y += 0.01 * speedMultiplier; // Acelera la rotación en función de la velocidad
+        mesh.rotation.y += 0.01 * speedMultiplier;
       });
 
       controls.update();
@@ -155,7 +123,6 @@ const SolarSystem = () => {
 
     animate();
 
-    // Limpiar al desmontar
     return () => {
       if (currentMountRef) {
         currentMountRef.removeChild(renderer.domElement);
@@ -163,7 +130,7 @@ const SolarSystem = () => {
       scene.clear();
       renderer.dispose();
     };
-  }, [speedMultiplier]); // La animación se actualizará cuando cambie el multiplicador de velocidad
+  }, [speedMultiplier]);
 
   return (
     <div>
