@@ -1,4 +1,4 @@
 [build]
-  base = "."             # Set to current directory (frontend)
-  publish = "build"      # Output directory for the published files
-  command = "npm run build"  # Command to build the site
+  base = "frontend"                   # La carpeta donde está tu package.json
+  publish = "frontend/build"          # La carpeta generada por React después de la construcción
+  command = "npm install && npm run build"  # Comando de construcción
