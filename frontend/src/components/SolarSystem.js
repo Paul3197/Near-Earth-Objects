@@ -117,7 +117,6 @@ const SolarSystem = () => {
         const uv = ringGeometry.attributes.uv;
         for (let i = 0; i < uv.count; i++) {
           const u = uv.getX(i);
-          const v = uv.getY(i);
           // Ajustar las coordenadas para que las líneas de la textura se envuelvan correctamente alrededor del anillo
           const angle = u * Math.PI * 2;
           const newU = Math.cos(angle) * 0.5 + 0.5; // Convertir coordenadas polares a UV
