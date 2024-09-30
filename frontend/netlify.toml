@@ -1,8 +1,4 @@
 [build]
-  publish = ".next"
-  command = "npm run build"
-
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+  base = "."             # Set to current directory (frontend)
+  publish = "build"      # Output directory for the published files
+  command = "npm run build"  # Command to build the site
