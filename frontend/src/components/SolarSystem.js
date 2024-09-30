@@ -3,16 +3,16 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // Importar texturas
-import mercuryImg from './img/mercury.jpg';
-import venusImg from './img/venus.jpg';
-import earthImg from './img/earth_dy.jpg';
-import marsImg from './img/marte.jpg';
-import jupiterImg from './img/jupiter.jpg';
-import saturnImg from './img/saturn.jpg';
-import uranusImg from './img/urano.jpg';
-import neptuneImg from './img/neptune.jpg';
-import ringImg from './img/ring.png';
-import sunImg from './img/sun.jpg'; // Importar la textura del sol
+import mercuryImg from '../img/earth_ng.jpg';
+import venusImg from '../img/venus.jpg';
+import earthImg from '../img/earth_dy.jpg';
+import marsImg from '../img/marte.jpg';
+import jupiterImg from '../img/jupiter.jpg';
+import saturnImg from '../img/saturn.jpg';
+import uranusImg from '../img/urano.jpg';
+import neptuneImg from '../img/neptune.jpg';
+import ringImg from '../img/ring.png';
+import sunImg from '../img/sun.jpg'; // Importar la textura del sol
 
 const SolarSystem = () => {
   const mountRef = useRef(null);
