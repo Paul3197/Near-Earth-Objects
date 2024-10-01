@@ -13,26 +13,34 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      inclination: {
+      nasa_jpl_url: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      estimated_diameter_min: {
         type: Sequelize.FLOAT,
-        allowNull: true,
-        defaultValue: 0.0,
+        allowNull: false,
       },
-      eccentricity: {
+      estimated_diameter_max: {
         type: Sequelize.FLOAT,
         allowNull: false,
-        defaultValue: 0.0,
       },
-      createdAt: {
-        type: Sequelize.DATE,
+      is_potentially_hazardous_asteroid: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
       },
-      updatedAt: {
-        type: Sequelize.DATE,
+      kilometers_per_second: {
+        type: Sequelize.FLOAT,
         allowNull: false,
-        defaultValue: Sequelize.NOW,
-      }
+      },
+      kilometers_per_hour: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
+      orbiting_body: {
+        type: Sequelize.FLOAT,
+        allowNull: false,
+      },
     });
   },
 

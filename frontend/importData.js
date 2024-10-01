@@ -1,9 +1,12 @@
-const fetch = require('node-fetch');
-const { Comet, Asteroid } = require('./models'); // Ajusta la ruta según tu estructura
+const fetch = require("node-fetch");
+const { Comet, Asteroid } = require("./models"); // Ajusta la ruta según tu estructura
 
-const apiKey = "nN7jPtSC28o6T79F77aekXb6bUn8MZOtObMl01em"; // Tu clave de API
+// API de cometas
 const cometsUrl = `https://data.nasa.gov/resource/b67r-rgxc.json`;
-const asteroidUrl = `https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=${apiKey}`;
+
+// API de asteroides
+const apiKey = "nN7jPtSC28o6T79F77aekXb6bUn8MZOtObMl01em"; // Clave de API
+const asteroidUrl = `https://api.nasa.gov/neo/rest/v1/neo/browse?page=1&size=20&api_key=${apiKey}}`;
 
 async function fetchComets() {
   try {
@@ -53,22 +56,22 @@ async function saveData() {
     }
   }
 
-  for (const asteroid of asteroids) {
-    if (asteroid.inclination !== null) {
+  if (asteroids) {
+    for (const asteroid of asteroids) {
       await Asteroid.create({
         id: asteroid.id,
         name: asteroid.name,
-        inclination: asteroid.inclination,
-        eccentricity: asteroid.eccentricity,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        nasa_jpl_url: asteroid.nasa_jpl_url,
+        estimated_diameter_min: asteroid.estimated_diameter.kilometers.estimated_diameter_min,
+        estimated_diameter_max: asteroid.estimated_diameter.kilometers.estimated_diameter_max,
+        is_potentially_hazardous_asteroid: asteroid.is_potentially_hazardous_asteroid,
+        kilometers_per_second: asteroid.close_approach_data.relative_velocity.kilometers_per_second,
+        kilometers_per_hour: asteroid.close_approach_data.relative_velocity.kilometers_per_hour,
+        miles_per_hour: asteroid.close_approach_data.relative_velocity.miles_per_hour,
+        orbiting_body: asteroid.close_approach_data.orbiting_body
       });
-    } else {
-      console.log(`El asteroide ${asteroid.name} no tiene inclinación, no se insertará.`);
     }
   }
 }
-
-
 
 saveData();

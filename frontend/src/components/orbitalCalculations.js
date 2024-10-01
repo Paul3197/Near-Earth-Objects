@@ -15,7 +15,6 @@ export function calculateEllipticalPosition(orbitalElements, time) {
     return { x, z };
 }
 
-
 function calculateMeanAnomaly(time) {
     const n = 0.9856076686; // Velocidad angular media, tasa de cambio del angulo
     return n * time;

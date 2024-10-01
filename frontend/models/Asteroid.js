@@ -13,15 +13,33 @@ const Asteroid = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    inclination: {
-      type: DataTypes.FLOAT,
-      allowNull: true,
-      defaultValue: 0.0,
+    nasa_jpl_url: {
+      type: DataTypes.STRING,
+      allowNull: false,
     },
-    eccentricity: {
+    estimated_diameter_min: {
       type: DataTypes.FLOAT,
       allowNull: false,
-      defaultValue: 0.0,
+    },
+    estimated_diameter_max: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    is_potentially_hazardous_asteroid: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+    },
+    kilometers_per_second: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    kilometers_per_hour: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+    },
+    orbiting_body: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
     },
   },
   {
