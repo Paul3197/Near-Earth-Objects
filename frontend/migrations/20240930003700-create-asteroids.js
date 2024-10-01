@@ -29,17 +29,15 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         allowNull: false,
       },
-      kilometers_per_second: {
-        type: Sequelize.FLOAT,
+      createdAt: {
         allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      kilometers_per_hour: {
-        type: Sequelize.FLOAT,
+      updatedAt: {
         allowNull: false,
-      },
-      orbiting_body: {
-        type: Sequelize.FLOAT,
-        allowNull: false,
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP'),
       },
     });
   },

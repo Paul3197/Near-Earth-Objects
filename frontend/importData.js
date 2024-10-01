@@ -6,7 +6,7 @@ const cometsUrl = `https://data.nasa.gov/resource/b67r-rgxc.json`;
 
 // API de asteroides
 const apiKey = "nN7jPtSC28o6T79F77aekXb6bUn8MZOtObMl01em"; // Clave de API
-const asteroidUrl = `https://api.nasa.gov/neo/rest/v1/neo/browse?page=1&size=20&api_key=${apiKey}}`;
+const asteroidUrl = `https://api.nasa.gov/neo/rest/v1/neo/2000433?api_key=nN7jPtSC28o6T79F77aekXb6bUn8MZOtObMl01em`;
 
 async function fetchComets() {
   try {
@@ -22,16 +22,37 @@ async function fetchComets() {
 
 async function fetchAsteroids() {
   try {
+      const response = await fetch(`https://api.nasa.gov/neo/rest/v1/neo/browse?api_key=${apiKey}`);
+      const data = await response.json();
+      
+      // Verificar si `data.near_earth_objects` es un array o un objeto.
+      const asteroids = data.near_earth_objects;
+      
+      if (Array.isArray(asteroids)) {
+          return asteroids;
+      } else if (typeof asteroids === 'object') {
+          // Si es un objeto, devuélvelo como un array con un solo elemento
+          return [asteroids];
+      } else {
+          throw new Error("La API no devolvió asteroides válidos");
+      }
+  } catch (error) {
+      console.error("Hubo un problema con la solicitud de asteroides:", error);
+      throw error;
+  }
+}
+
+/* async function fetchAsteroids() {
+  try {
     const response = await fetch(asteroidUrl);
     if (!response.ok) {
       throw new Error("Error en la respuesta de la API de asteroides");
     }
-    const data = await response.json();
-    return data.near_earth_objects; // Asegúrate de que esto es lo que necesitas
+    return await response.json()
   } catch (error) {
     console.error("Hubo un problema con la solicitud de asteroides:", error);
   }
-}
+} */
 
 async function saveData() {
   const comets = await fetchComets();
@@ -65,10 +86,6 @@ async function saveData() {
         estimated_diameter_min: asteroid.estimated_diameter.kilometers.estimated_diameter_min,
         estimated_diameter_max: asteroid.estimated_diameter.kilometers.estimated_diameter_max,
         is_potentially_hazardous_asteroid: asteroid.is_potentially_hazardous_asteroid,
-        kilometers_per_second: asteroid.close_approach_data.relative_velocity.kilometers_per_second,
-        kilometers_per_hour: asteroid.close_approach_data.relative_velocity.kilometers_per_hour,
-        miles_per_hour: asteroid.close_approach_data.relative_velocity.miles_per_hour,
-        orbiting_body: asteroid.close_approach_data.orbiting_body
       });
     }
   }

@@ -29,18 +29,6 @@ const Asteroid = sequelize.define(
       type: DataTypes.BOOLEAN,
       allowNull: false,
     },
-    kilometers_per_second: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    kilometers_per_hour: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
-    orbiting_body: {
-      type: DataTypes.FLOAT,
-      allowNull: false,
-    },
   },
   {
     sequelize,
