@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState } from 'react';
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import planetsData from './data/planetData'; // Importar los datos de los planetas
-import ringImg from './img/ring.png';
-import sunImg from './img/sun.jpg';
+import React, { useRef, useEffect, useState } from "react";
+import * as THREE from "three";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import planetsData from "./data/planetData"; // Importar los datos de los planetas
+import ringImg from "../img/ring.png";
+import sunImg from "../img/sun.jpg";
 
 const SolarSystem = () => {
   const mountRef = useRef(null);
@@ -12,7 +12,12 @@ const SolarSystem = () => {
   useEffect(() => {
     const currentMountRef = mountRef.current;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     currentMountRef.appendChild(renderer.domElement);
@@ -22,7 +27,107 @@ const SolarSystem = () => {
     const textureLoader = new THREE.TextureLoader();
 
     // Crear fondo estrellado
+
+    const starMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        color: { value: new THREE.Color(0xffffff) },
+      },
+      vertexShader: `
+        varying vec3 vColor;
+        void main() {
+          // Pasar el color al fragment shader
+          vColor = color;
+          vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+          gl_PointSize = 10.0 * ( 280.0 / -mvPosition.z ); // Tamaño de las estrellas ajustado por la distancia
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+  varying vec3 vColor;
+
+  // Función para crear el degradado circular del centro
+  float circularGradient(vec2 coord, float radius) {
+    vec2 centeredCoord = coord - vec2(0.5, 0.5); // Centrar las coordenadas
+    float distance = length(centeredCoord);
+    return 1.0 - smoothstep(0.0, radius, distance); // Degradado suave desde el centro
+  }
+
+  // Función para generar los picos puntiagudos
+  float starSpikes(vec2 coord, float spikes, float sharpness) {
+    vec2 centeredCoord = coord - vec2(0.5, 0.5);
+    
+    // Invertir el ángulo para girar los picos 180 grados
+    float angle = atan(centeredCoord.y, centeredCoord.x) + 3.14159265; // Sumar pi (180 grados)
+    
+    float radius = length(centeredCoord);
+    
+    // Crear un patrón de pico puntiagudo utilizando cosenos y una función de poder para afilar
+    float spikeEffect = pow(abs(cos(angle * spikes)), sharpness);
+    
+    // Ajustar el borde del pico para que sea más puntiagudo
+    float edgeEffect = smoothstep(0.5, 0.0, radius);
+    return spikeEffect * edgeEffect;
+  }
+
+  void main() {
+    // Crear el degradado suave del círculo central
+    float centerCircle = circularGradient(gl_PointCoord, 0.35); // Tamaño del círculo central
+
+    // Generar las puntas puntiagudas con 6 picos (ajustable)
+    float spikes = starSpikes(gl_PointCoord, 2.0, 10.0); // Número de puntas y agudeza
+
+    // Combinar el círculo con los picos puntiagudos
+    float shape = max(centerCircle, spikes); // Mantener el círculo y añadir picos
+
+    // Aplicar un difuminado general hacia los bordes (intensidad se desvanece)
+    shape *= 1.0 - length(gl_PointCoord - vec2(0.5, 0.5)); // Difuminación en los bordes
+
+    // Aplicar el color de la estrella
+    vec4 starColor = vec4(vColor, shape);
+
+    if (starColor.a < 0.05) discard; // Descartar píxeles con baja opacidad
+    gl_FragColor = starColor;
+  }
+`
+,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      transparent: true,
+      vertexColors: true,
+    });
+
+    // Crear geometría y color de las estrellas
     const starGeometry = new THREE.BufferGeometry();
+    const starVertices = [];
+    const starColors = [];
+
+    for (let i = 0; i < 7000; i++) {
+      const x = THREE.MathUtils.randFloatSpread(2000);
+      const y = THREE.MathUtils.randFloatSpread(2000);
+      const z = THREE.MathUtils.randFloatSpread(2000);
+      starVertices.push(x, y, z);
+
+      // Generar colores pastel para las estrellas
+      const color = new THREE.Color();
+      color.setHSL(Math.random(), 0.7, 0.9); // Colores brillantes y suaves
+      starColors.push(color.r, color.g, color.b);
+    }
+
+    // Añadir los atributos a la geometría de las estrellas
+    starGeometry.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(starVertices, 3)
+    );
+    starGeometry.setAttribute(
+      "color",
+      new THREE.Float32BufferAttribute(starColors, 3)
+    );
+
+    // Crear el objeto Points para las estrellas
+    const stars = new THREE.Points(starGeometry, starMaterial);
+    scene.add(stars);
+
+    /*
     const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
     const starVertices = [];
     for (let i = 0; i < 10000; i++) {
@@ -33,11 +138,13 @@ const SolarSystem = () => {
     }
     starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
     const stars = new THREE.Points(starGeometry, starMaterial);
-    scene.add(stars);
+    scene.add(stars); */
 
     // Crear el sol
     const geometrySun = new THREE.SphereGeometry(3, 32, 32);
-    const materialSun = new THREE.MeshBasicMaterial({ map: textureLoader.load(sunImg) });
+    const materialSun = new THREE.MeshBasicMaterial({
+      map: textureLoader.load(sunImg),
+    });
     const sun = new THREE.Mesh(geometrySun, materialSun);
     scene.add(sun);
 
@@ -47,25 +154,28 @@ const SolarSystem = () => {
 
     const planets = [];
 
-    planetsData.forEach(planetData => {
+    planetsData.forEach((planetData) => {
       const geometryPlanet = new THREE.SphereGeometry(planetData.size, 32, 32);
       const materialPlanet = new THREE.MeshPhongMaterial({
-        map: textureLoader.load(planetData.texture)
+        map: textureLoader.load(planetData.texture),
       });
       const planet = new THREE.Mesh(geometryPlanet, materialPlanet);
 
-      const distanceAtPerihelion = planetData.distance * (1 - planetData.eccentricity);
+      const distanceAtPerihelion =
+        planetData.distance * (1 - planetData.eccentricity);
       planet.position.x = distanceAtPerihelion;
       scene.add(planet);
       planets.push({ mesh: planet, ...planetData });
 
       // Crear la órbita
       const curve = new THREE.EllipseCurve(
-        0, 0, 
-        planetData.distance * (1 + planetData.eccentricity), 
-        planetData.distance * (1 - planetData.eccentricity), 
-        0, 2 * Math.PI, 
-        false, 
+        0,
+        0,
+        planetData.distance * (1 + planetData.eccentricity),
+        planetData.distance * (1 - planetData.eccentricity),
+        0,
+        2 * Math.PI,
+        false,
         THREE.MathUtils.degToRad(planetData.inclination)
       );
 
@@ -80,9 +190,9 @@ const SolarSystem = () => {
       if (planetData.hasRings) {
         const ringGeometry = new THREE.RingGeometry(3, 4, 64);
         const ringMaterial = new THREE.MeshBasicMaterial({
-          map: textureLoader.load(ringImg), 
+          map: textureLoader.load(ringImg),
           side: THREE.DoubleSide,
-          transparent: true
+          transparent: true,
         });
 
         const uv = ringGeometry.attributes.uv;
@@ -135,15 +245,15 @@ const SolarSystem = () => {
   return (
     <div>
       <div ref={mountRef}></div>
-      <div>
-        <label>Speed Multiplier:</label>
+      <div className="container">
+        <label>Velocidad:</label>
         <input
           type="range"
           min="0.1"
           max="10"
           step="0.1"
           value={speedMultiplier}
-          onChange={e => setSpeedMultiplier(parseFloat(e.target.value))}
+          onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
         />
       </div>
     </div>

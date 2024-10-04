@@ -1,11 +1,11 @@
-import mercuryImg from '../img/mercury.jpg';
-import venusImg from '../img/venus.jpg';
-import earthImg from '../img/earth_dy.jpg';
-import marsImg from '../img/marte.jpg';
-import jupiterImg from '../img/jupiter.jpg';
-import saturnImg from '../img/saturn.jpg';
-import uranusImg from '../img/urano.jpg';
-import neptuneImg from '../img/neptune.jpg';
+import mercuryImg from '../../img/mercury.jpg';
+import venusImg from '../../img/venus.jpg';
+import earthImg from '../../img/earth_dy.jpg';
+import marsImg from '../../img/marte.jpg';
+import jupiterImg from '../../img/jupiter.jpg';
+import saturnImg from '../../img/saturn.jpg';
+import uranusImg from '../../img/urano.jpg';
+import neptuneImg from '../../img/neptune.jpg';
 
 const planetsData = [
     { name: 'Mercury', texture: mercuryImg, size: 0.5, distance: 5, inclination: 7, eccentricity: 0.2056, speedFactor: 1.61 },
