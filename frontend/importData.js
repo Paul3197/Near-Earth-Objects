@@ -42,18 +42,6 @@ async function fetchAsteroids() {
   }
 }
 
-/* async function fetchAsteroids() {
-  try {
-    const response = await fetch(asteroidUrl);
-    if (!response.ok) {
-      throw new Error("Error en la respuesta de la API de asteroides");
-    }
-    return await response.json()
-  } catch (error) {
-    console.error("Hubo un problema con la solicitud de asteroides:", error);
-  }
-} */
-
 async function saveData() {
   const comets = await fetchComets();
   const asteroids = await fetchAsteroids();

@@ -8,22 +8,27 @@ import sunImg from "../img/sun.jpg";
 const SolarSystem = () => {
   const mountRef = useRef(null);
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
+  const [timeScaleLabel, setTimeScaleLabel] = useState("Hour");
+
+  // Determinar la escala de tiuempo basado en la velocidad
+  const determineTimeScale = (multiplier) => {
+    if (multiplier <= 1) return `${Math.round(multiplier)} Hour`; // 1 hora o menos
+    if (multiplier <= 24) return `${Math.round(multiplier)} Hours`; // Hasta 24 horas
+    if (multiplier <= 48) return `${Math.round(multiplier / 24)} Day`; // 1-2 días
+    if (multiplier <= 365 * 24) return `${Math.round(multiplier / 24)} Days`; // Hasta 365 días
+    if (multiplier <= 8760) return `${Math.round(multiplier / 24 / 365)} Year`; // Hasta 1 año
+    return `${(multiplier / 8760).toFixed(2)} Years`; // Más de 1 año, muestra en años con decimales
+  };
 
   useEffect(() => {
     const currentMountRef = mountRef.current;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-      75,
-      window.innerWidth / window.innerHeight,
-      0.1,
-      1000
-    );
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     currentMountRef.appendChild(renderer.domElement);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-
     const textureLoader = new THREE.TextureLoader();
 
     // Crear fondo estrellado
@@ -43,53 +48,51 @@ const SolarSystem = () => {
         }
       `,
       fragmentShader: `
-  varying vec3 vColor;
+      varying vec3 vColor;
 
-  // Función para crear el degradado circular del centro
-  float circularGradient(vec2 coord, float radius) {
-    vec2 centeredCoord = coord - vec2(0.5, 0.5); // Centrar las coordenadas
-    float distance = length(centeredCoord);
-    return 1.0 - smoothstep(0.0, radius, distance); // Degradado suave desde el centro
-  }
+      // Función para crear el degradado circular del centro
+      float circularGradient(vec2 coord, float radius) {
+        vec2 centeredCoord = coord - vec2(0.5, 0.5); // Centrar las coordenadas
+        float distance = length(centeredCoord);
+        return 1.0 - smoothstep(0.0, radius, distance); // Degradado suave desde el centro
+      }
 
-  // Función para generar los picos puntiagudos
-  float starSpikes(vec2 coord, float spikes, float sharpness) {
-    vec2 centeredCoord = coord - vec2(0.5, 0.5);
-    
-    // Invertir el ángulo para girar los picos 180 grados
-    float angle = atan(centeredCoord.y, centeredCoord.x) + 3.14159265; // Sumar pi (180 grados)
-    
-    float radius = length(centeredCoord);
-    
-    // Crear un patrón de pico puntiagudo utilizando cosenos y una función de poder para afilar
-    float spikeEffect = pow(abs(cos(angle * spikes)), sharpness);
-    
-    // Ajustar el borde del pico para que sea más puntiagudo
-    float edgeEffect = smoothstep(0.5, 0.0, radius);
-    return spikeEffect * edgeEffect;
-  }
+      // Función para generar los picos puntiagudos
+      float starSpikes(vec2 coord, float spikes, float sharpness) {
+        vec2 centeredCoord = coord - vec2(0.5, 0.5);
 
-  void main() {
-    // Crear el degradado suave del círculo central
-    float centerCircle = circularGradient(gl_PointCoord, 0.35); // Tamaño del círculo central
+        // Invertir el ángulo para girar los picos 180 grados
+        float angle = atan(centeredCoord.y, centeredCoord.x) + 3.14159265; // Sumar pi (180 grados)
 
-    // Generar las puntas puntiagudas con 6 picos (ajustable)
-    float spikes = starSpikes(gl_PointCoord, 2.0, 10.0); // Número de puntas y agudeza
+        float radius = length(centeredCoord);
 
-    // Combinar el círculo con los picos puntiagudos
-    float shape = max(centerCircle, spikes); // Mantener el círculo y añadir picos
+        // Crear un patrón de pico puntiagudo utilizando cosenos y una función de poder para afilar
+        float spikeEffect = pow(abs(cos(angle * spikes)), sharpness);
 
-    // Aplicar un difuminado general hacia los bordes (intensidad se desvanece)
-    shape *= 1.0 - length(gl_PointCoord - vec2(0.5, 0.5)); // Difuminación en los bordes
+        // Ajustar el borde del pico para que sea más puntiagudo
+        float edgeEffect = smoothstep(0.5, 0.0, radius);
+        return spikeEffect * edgeEffect;
+      }
 
-    // Aplicar el color de la estrella
-    vec4 starColor = vec4(vColor, shape);
+      void main() {
+        // Crear el degradado suave del círculo central
+        float centerCircle = circularGradient(gl_PointCoord, 0.35); // Tamaño del círculo central
 
-    if (starColor.a < 0.05) discard; // Descartar píxeles con baja opacidad
-    gl_FragColor = starColor;
-  }
-`
-,
+        // Generar las puntas puntiagudas con 6 picos (ajustable)
+        float spikes = starSpikes(gl_PointCoord, 2.0, 10.0); // Número de puntas y agudeza
+
+        // Combinar el círculo con los picos puntiagudos
+        float shape = max(centerCircle, spikes); // Mantener el círculo y añadir picos
+
+        // Aplicar un difuminado general hacia los bordes (intensidad se desvanece)
+        shape *= 1.0 - length(gl_PointCoord - vec2(0.5, 0.5)); // Difuminación en los bordes
+
+        // Aplicar el color de la estrella
+        vec4 starColor = vec4(vColor, shape);
+
+        if (starColor.a < 0.05) discard; // Descartar píxeles con baja opacidad
+        gl_FragColor = starColor;
+        }`,
       blending: THREE.AdditiveBlending,
       depthTest: false,
       transparent: true,
@@ -161,21 +164,15 @@ const SolarSystem = () => {
       });
       const planet = new THREE.Mesh(geometryPlanet, materialPlanet);
 
-      const distanceAtPerihelion =
-        planetData.distance * (1 - planetData.eccentricity);
+      const distanceAtPerihelion = planetData.distance * (1 - planetData.eccentricity);
       planet.position.x = distanceAtPerihelion;
       scene.add(planet);
       planets.push({ mesh: planet, ...planetData });
 
       // Crear la órbita
       const curve = new THREE.EllipseCurve(
-        0,
-        0,
-        planetData.distance * (1 + planetData.eccentricity),
-        planetData.distance * (1 - planetData.eccentricity),
-        0,
-        2 * Math.PI,
-        false,
+        0, 0, planetData.distance * (1 + planetData.eccentricity),
+        planetData.distance * (1 - planetData.eccentricity), 0, 2 * Math.PI, false,
         THREE.MathUtils.degToRad(planetData.inclination)
       );
 
@@ -215,43 +212,53 @@ const SolarSystem = () => {
 
     const animate = () => {
       requestAnimationFrame(animate);
-
-      planets.forEach(({ mesh, distance, eccentricity, speedFactor }) => {
-        const time = Date.now() * 0.00005 * speedFactor * speedMultiplier;
-        const angle = time % (2 * Math.PI);
+    
+      planets.forEach(({ mesh, distance, eccentricity, orbitalPeriod }) => {
+        // Convertir el período orbital en un factor de velocidad
+        const time = Date.now() * 0.0001 * speedMultiplier;
+        const orbitalSpeed = (2 * Math.PI) / orbitalPeriod; // Velocidad angular (rad/s) inversamente proporcional al período orbital
+        const angle = time * orbitalSpeed; // Angulo basado en la velocidad orbital y el tiempo
         const radiusX = distance * (1 + eccentricity);
         const radiusY = distance * (1 - eccentricity);
+    
         mesh.position.x = radiusX * Math.cos(angle);
         mesh.position.z = radiusY * Math.sin(angle);
-
+    
+        // Rotación del planeta
         mesh.rotation.y += 0.01 * speedMultiplier;
       });
-
+    
       controls.update();
       renderer.render(scene, camera);
     };
-
+    
     animate();
 
+    // Funcion para determinar la escala de tiempo basada en la velocidad
+    
     return () => {
       if (currentMountRef) {
         currentMountRef.removeChild(renderer.domElement);
       }
-      scene.clear();
       renderer.dispose();
     };
+  }, [speedMultiplier]);
+
+  useEffect(() => {
+    setTimeScaleLabel(determineTimeScale(speedMultiplier));
   }, [speedMultiplier]);
 
   return (
     <div>
       <div ref={mountRef}></div>
       <div className="container">
-        <label>Velocidad:</label>
+        <label>Velocidad del sistema solar (Tiempo simulado):</label>
+        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{timeScaleLabel}</div>
         <input
           type="range"
-          min="0.1"
-          max="10"
-          step="0.1"
+          min="1"
+          max="8760"  // Un año tiene 8760 horas
+          step="1"
           value={speedMultiplier}
           onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
         />

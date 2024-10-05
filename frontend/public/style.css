@@ -3,6 +3,7 @@ html, body {
     padding: 0;
     overflow-x: hidden;
     background-color: #000; /* Fondo oscuro */
+    height: 100vh;
   }
   
   input[type="range"] {
@@ -37,7 +38,7 @@ html, body {
   }
   
 .container {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
