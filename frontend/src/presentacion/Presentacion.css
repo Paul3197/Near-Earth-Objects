@@ -1,0 +1,234 @@
+/* Fondo de pantalla completo */
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%; /* Aseguramos que ocupen toda la pantalla */
+  background-image: url('./source/bkg.png'); /* Ajusta la ruta según sea necesario */
+  background-size: cover; /* Cubrir todo el fondo */
+  background-position: center; /* Centrar la imagen de fondo */
+  background-repeat: no-repeat; /* No repetir la imagen */
+  font-family: 'Arial', sans-serif;
+  overflow: hidden; /* Para evitar scroll */
+}
+
+/* Contenedor principal de la presentación */
+.presentacion-container {
+  display: flex;
+  align-items: flex-start; /* Alinear al principio */
+  justify-content: space-between; /* Espacio entre astronauta y menús */
+  padding: 40px;
+  height: 100vh; /* Abarca toda la altura de la pantalla */
+  width: 100%; /* Abarca todo el ancho de la pantalla */
+  box-sizing: border-box; /* Para incluir padding dentro del tamaño total */
+  border-radius: 15px; /* Bordes redondeados */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5); /* Sombra alrededor */
+  color: #fff;
+  position: relative; /* Necesario para posicionar los botones absolutos */
+}
+
+/* Contenedor del astronauta */
+.astronauta-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centrar elementos dentro del contenedor del astronauta */
+}
+
+.astronauta-nombre {
+  margin-bottom: 10px;
+  font-size: 24px; /* Tamaño del nombre */
+  font-weight: bold; /* Negrita */
+}
+
+/* Imagen del astronauta */
+.astronauta-img {
+  width: 150px;
+  height: auto;
+  transition: transform 0.3s; /* Efecto de zoom suave al pasar el mouse */
+}
+
+.astronauta-img:hover {
+  transform: scale(1.1); /* Aumenta el tamaño ligeramente al pasar el mouse */
+}
+
+/* Contenedor de los menús futurista */
+.menus-container-futurista {
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 50, 0.8); /* Fondo oscuro con toque espacial */
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(0, 153, 255, 0.5); /* Sombra azul neón */
+  backdrop-filter: blur(10px); /* Desenfoque para efecto futurista */
+  margin-right: 30px; /* Separar los menús del borde derecho */
+}
+
+/* Botones de los menús futuristas */
+.menu button {
+  background-color: rgba(0, 102, 204, 0.8); /* Azul oscuro espacial */
+  color: #fff;
+  padding: 15px 20px;
+  border: 2px solid rgba(0, 204, 255, 0.6); /* Bordes neón */
+  border-radius: 10px;
+  font-size: 18px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif; /* Tipografía futurista */
+  margin-bottom: 15px; /* Espacio entre los botones */
+}
+
+.menu button:hover {
+  background-color: rgba(0, 153, 255, 1); /* Más brillante al pasar el mouse */
+  box-shadow: 0 0 15px rgba(0, 204, 255, 0.9); /* Sombra luminosa */
+  transform: translateY(-5px); /* Efecto de levantamiento */
+}
+
+/* Texto del menú desplegable */
+.menu-desplegable-texto {
+  background-color: rgba(0, 102, 204, 0.8); /* Mismo fondo de los botones */
+  color: #fff;
+  padding: 10px 15px; /* Ajustar el padding para mayor legibilidad */
+  border-radius: 10px; /* Bordes redondeados */
+  margin-top: 10px; /* Separar un poco el texto de los menús */
+}
+
+/* Contenedor de botones de navegación (anterior/siguiente) */
+.botones-container {
+  position: absolute; /* Posiciona los botones de forma absoluta */
+  bottom: 40px; /* Distancia desde el fondo */
+  left: 40px; /* Distancia desde la izquierda */
+  right: 40px; /* Distancia desde la derecha */
+  display: flex;
+  justify-content: space-between; /* Espacio entre los botones */
+}
+
+/* Botones de navegación (anterior/siguiente) con estilo futurista */
+.btn-anterior,
+.btn-siguiente {
+  padding: 15px 25px; /* Padding aumentado para mayor tamaño */
+  background-color: rgba(0, 102, 204, 0.8); /* Azul oscuro espacial */
+  color: white;
+  border: 2px solid rgba(0, 204, 255, 0.6); /* Bordes neón */
+  border-radius: 10px; /* Bordes redondeados como en los menús */
+  font-size: 18px;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif; /* Tipografía futurista */
+  cursor: pointer;
+  transition: all 0.3s ease; /* Transición suave */
+  box-shadow: 0 0 15px rgba(0, 204, 255, 0.9); /* Sombra luminosa */
+}
+
+/* Efecto hover para los botones de anterior y siguiente */
+.btn-anterior:hover:not(:disabled),
+.btn-siguiente:hover {
+  background-color: rgba(0, 153, 255, 1); /* Más brillante al pasar el mouse */
+  transform: translateY(-5px); /* Efecto de levantamiento */
+  box-shadow: 0 0 20px rgba(0, 204, 255, 1); /* Sombra luminosa más intensa */
+}
+
+/* Botón anterior deshabilitado */
+.btn-anterior:disabled {
+  background-color: #aaa; /* Color gris para botón deshabilitado */
+  cursor: not-allowed; /* Cursor indicando que no se puede clickear */
+  box-shadow: none; /* Sin sombra cuando está deshabilitado */
+}
+
+
+/* Centrar texto horizontalmente */
+h2 {
+  text-align: center; /* Centra el texto horizontalmente */
+}
+
+/* Si quieres centrar también verticalmente dentro de un contenedor */
+h2 {
+  display: flex;
+  justify-content: center; /* Centrar horizontalmente */
+  align-items: center;     /* Centrar verticalmente */
+  height: 100%;            /* Asegura que el contenedor tenga suficiente altura para la alineación */
+  text-align: center;      /* Asegura que el texto dentro del h2 esté centrado */
+}
+
+/* Estilo para todos los párrafos */
+p {
+  background-color: rgba(1, 176, 230, 0.8); /* Fondo oscuro con un toque espacial */
+  color: #ffffff; /* Color del texto */
+  padding: 10px; /* Espaciado interno */
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 0 15px rgb(0, 204, 255); /* Sombra azul neón */
+  backdrop-filter: blur(10px); /* Desenfoque para efecto futurista */
+  font-family: 'Arial', sans-serif; /* Fuente de texto */
+  margin: 10px 0; /* Espaciado entre párrafos */
+}
+
+
+/* Estilos generales para las imágenes */
+img {
+  width: 650px; /* Tamaño de la imagen (puedes ajustarlo) */
+  object-fit: cover; /* Para asegurarte de que la imagen no se distorsione */
+  display: block;
+  margin: 0 auto; /* Centrado horizontal */
+  animation: float 6s ease-in-out infinite; /* Duración de 6s para el ciclo de flote */
+}
+
+/* Animación de flote */
+@keyframes float {
+  0% {
+    transform: translateY(0); /* Posición inicial */
+  }
+  50% {
+    transform: translateY(-20px); /* Sube 10px */
+  }
+  100% {
+    transform: translateY(0); /* Vuelve a la posición inicial */
+  }
+}
+
+/* Estilos para h2 con tema espacial y colores más llamativos */
+h2 {
+  color: white; /* Color del texto */
+  text-align: center; /* Centra el texto */
+  font-family: 'Orbitron', sans-serif; /* Tipografía futurista */
+  font-size: 2.5em; /* Tamaño de fuente */
+  letter-spacing: 2px; /* Espaciado entre letras */
+  padding: 15px;
+  margin: 20px auto; /* Centrado y separación del resto del contenido */
+  width: 60%; /* Ajuste del ancho para que no sea demasiado largo */
+  border-radius: 20px; /* Bordes redondeados */
+
+  /* Fondo degradado con colores más claros y llamativos */
+  background: linear-gradient(135deg, #33ccff, #98cdec, #99e6ff, #33ccff); 
+  background-size: 400% 400%;
+  animation: gradient 6s ease infinite;
+
+  /* Sombra en el texto para simular un brillo de estrellas */
+  text-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.8), /* Brillo blanco */
+    0 0 20px rgba(255, 255, 255, 0.6),
+    0 0 30px rgba(0, 150, 255, 0.5), /* Halo azul */
+    0 0 40px rgba(0, 100, 255, 0.4);
+
+  /* Borde con un brillo tenue que rodea el h2 */
+  border: 3px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 15px rgba(0, 150, 255, 0.5), inset 0 0 10px rgba(0, 150, 255, 0.5);
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Efecto de hover */
+h2:hover {
+  transform: scale(1.05); /* Aumenta ligeramente el tamaño */
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.8), inset 0 0 25px rgba(0, 150, 255, 0.8);
+}
+
+/* Animación para el degradado del h2 */
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

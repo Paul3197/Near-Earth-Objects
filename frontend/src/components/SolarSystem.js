@@ -143,6 +143,8 @@ const SolarSystem = () => {
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars); */
 
+    
+
     // Crear el sol
     const geometrySun = new THREE.SphereGeometry(3, 32, 32);
     const materialSun = new THREE.MeshBasicMaterial({
@@ -151,7 +153,7 @@ const SolarSystem = () => {
     const sun = new THREE.Mesh(geometrySun, materialSun);
     scene.add(sun);
 
-    const sunLight = new THREE.PointLight(0xffffff, 900, 500);
+    const sunLight = new THREE.PointLight(0xffffff, 100, 500);
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
 
@@ -168,6 +170,8 @@ const SolarSystem = () => {
       planet.position.x = distanceAtPerihelion;
       scene.add(planet);
       planets.push({ mesh: planet, ...planetData });
+
+      
 
       // Crear la órbita
       const curve = new THREE.EllipseCurve(
@@ -266,5 +270,7 @@ const SolarSystem = () => {
     </div>
   );
 };
+
+
 
 export default SolarSystem;

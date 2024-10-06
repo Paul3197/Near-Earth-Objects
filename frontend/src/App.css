@@ -36,3 +36,38 @@
     transform: rotate(360deg);
   }
 }
+
+.info-panel {
+  position: absolute;
+  top: 50px;
+  right: 20px;
+  width: 250px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  z-index: 100;
+}
+
+.info-panel h2 {
+  margin-top: 0;
+  font-size: 1.5em;
+}
+
+details {
+  margin-bottom: 10px;
+}
+
+.exit-focus-btn {
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.exit-focus-btn:hover {
+  background-color: #ff4500;
+}
+
