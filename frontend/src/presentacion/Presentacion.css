@@ -40,16 +40,7 @@ html, body {
   font-weight: bold; /* Negrita */
 }
 
-/* Imagen del astronauta */
-.astronauta-img {
-  width: 150px;
-  height: auto;
-  transition: transform 0.3s; /* Efecto de zoom suave al pasar el mouse */
-}
 
-.astronauta-img:hover {
-  transform: scale(1.1); /* Aumenta el tamaño ligeramente al pasar el mouse */
-}
 
 /* Contenedor de los menús futurista */
 .menus-container-futurista {
@@ -64,6 +55,21 @@ html, body {
 }
 
 /* Botones de los menús futuristas */
+
+.buttonDates{
+  background-color: rgba(0, 102, 204, 0.8); /* Azul oscuro espacial */
+  color: #fff;
+  padding: 12px 20px !important;
+  border: 2px solid rgba(0, 204, 255, 0.6); /* Bordes neón */
+  border-radius: 10px;
+  font-size: 18px;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif; /* Tipografía futurista */
+  margin-bottom: 10px !important;
+}
+
 .menu button {
   background-color: rgba(0, 102, 204, 0.8); /* Azul oscuro espacial */
   color: #fff;
@@ -77,6 +83,8 @@ html, body {
   font-family: 'Orbitron', sans-serif; /* Tipografía futurista */
   margin-bottom: 15px; /* Espacio entre los botones */
 }
+
+
 
 .menu button:hover {
   background-color: rgba(0, 153, 255, 1); /* Más brillante al pasar el mouse */
@@ -150,7 +158,8 @@ h2 {
 }
 
 /* Estilo para todos los párrafos */
-p {
+p { 
+  width: 20rem;
   background-color: rgba(1, 176, 230, 0.8); /* Fondo oscuro con un toque espacial */
   color: #ffffff; /* Color del texto */
   padding: 10px; /* Espaciado interno */
@@ -158,17 +167,37 @@ p {
   box-shadow: 0 0 15px rgb(0, 204, 255); /* Sombra azul neón */
   backdrop-filter: blur(10px); /* Desenfoque para efecto futurista */
   font-family: 'Arial', sans-serif; /* Fuente de texto */
-  margin: 10px 0; /* Espaciado entre párrafos */
+  margin: auto; /* Espaciado entre párrafos */
+  margin-bottom: 10px;
 }
 
+.planeta-img {
+  width: 100% !important; /* Hace que la imagen ocupe todo el ancho disponible del contenedor */
+  max-width: 350px;
+  min-width: 300px ;
+  height: auto; /* Mantiene la proporción original de la imagen */
+  display: block; 
+  margin: 0 auto; /* Centra la imagen horizontalmente */
+  margin-top: 70px;
+  object-fit: cover; /* Asegura que la imagen no se distorsione */
+  animation: float 6s ease-in-out infinite; /* Animación de flote */
+}
 
-/* Estilos generales para las imágenes */
-img {
-  width: 650px; /* Tamaño de la imagen (puedes ajustarlo) */
-  object-fit: cover; /* Para asegurarte de que la imagen no se distorsione */
+/* Imagen del astronauta */
+.astronauta-img {
+  width: 100%; /* Hace que la imagen ocupe todo el ancho disponible del contenedor */
+  max-width: 150px !important; /* Establece un ancho máximo para evitar que la imagen crezca demasiado en pantallas grandes */
+  min-width: 150px !important;
+  object-fit: cover;
   display: block;
-  margin: 0 auto; /* Centrado horizontal */
-  animation: float 6s ease-in-out infinite; /* Duración de 6s para el ciclo de flote */
+  height: auto;
+  transition: transform 0.3s; /* Efecto de zoom suave al pasar el mouse */
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.astronauta-img:hover {
+  transform: scale(1.1); /* Aumenta el tamaño ligeramente al pasar el mouse */
 }
 
 /* Animación de flote */
@@ -231,4 +260,53 @@ h2:hover {
   100% {
     background-position: 0% 50%;
   }
+}
+
+@media (max-width: 768px) {
+  .planeta-img {
+    max-width: 100%; /* En pantallas pequeñas, ajusta el tamaño máximo de la imagen */
+  }
+}
+
+.planeta-nombre{
+  font-size: 30px;
+}
+
+.datesP{
+  width: auto;
+  padding: auto;
+}
+
+.space-container {
+  background-color: #1a1a1a;
+  color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.space-title, .space-text {
+  font-family: 'Arial', sans-serif;
+  font-size: 0.7rem;
+}
+
+.space-link {
+  text-decoration: none;
+  color: #ffcc00;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: 2px solid #ffcc00;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+}
+
+.space-link:hover {
+  background-color: #ffcc00;
+  color: #1a1a1a;
+}
+
+.containerLink{
+  width: 300px;
+  text-align: center;
 }

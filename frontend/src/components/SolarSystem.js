@@ -4,11 +4,17 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import planetsData from "./data/planetData"; // Importar los datos de los planetas
 import ringImg from "../img/ring.png";
 import sunImg from "../img/sun.jpg";
+import "../App.css";
+import TWEEN from "@tweenjs/tween.js";
+let camera; // Mueve la cámara aquí, a nivel de componente
 
 const SolarSystem = () => {
   const mountRef = useRef(null);
   const [speedMultiplier, setSpeedMultiplier] = useState(1);
   const [timeScaleLabel, setTimeScaleLabel] = useState("Hour");
+  const [selectedPlanet, setSelectedPlanet] = useState(null); // Estado para el planeta seleccionado
+  const [planets, setPlanets] = useState([]);
+  const [cameraInitialPosition, setCameraInitialPosition] = useState({});
 
   // Determinar la escala de tiuempo basado en la velocidad
   const determineTimeScale = (multiplier) => {
@@ -23,7 +29,19 @@ const SolarSystem = () => {
   useEffect(() => {
     const currentMountRef = mountRef.current;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    );
+
+    setCameraInitialPosition({ x: 0, y: 0, z: 150 });
+
+    const planetsArray = [];
+
+    // Inicializar el renderer
     const renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     currentMountRef.appendChild(renderer.domElement);
@@ -32,7 +50,6 @@ const SolarSystem = () => {
     const textureLoader = new THREE.TextureLoader();
 
     // Crear fondo estrellado
-
     const starMaterial = new THREE.ShaderMaterial({
       uniforms: {
         color: { value: new THREE.Color(0xffffff) },
@@ -130,21 +147,6 @@ const SolarSystem = () => {
     const stars = new THREE.Points(starGeometry, starMaterial);
     scene.add(stars);
 
-    /*
-    const starMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 0.7 });
-    const starVertices = [];
-    for (let i = 0; i < 10000; i++) {
-      const x = THREE.MathUtils.randFloatSpread(2000);
-      const y = THREE.MathUtils.randFloatSpread(2000);
-      const z = THREE.MathUtils.randFloatSpread(2000);
-      starVertices.push(x, y, z);
-    }
-    starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starVertices, 3));
-    const stars = new THREE.Points(starGeometry, starMaterial);
-    scene.add(stars); */
-
-    
-
     // Crear el sol
     const geometrySun = new THREE.SphereGeometry(3, 32, 32);
     const materialSun = new THREE.MeshBasicMaterial({
@@ -153,7 +155,7 @@ const SolarSystem = () => {
     const sun = new THREE.Mesh(geometrySun, materialSun);
     scene.add(sun);
 
-    const sunLight = new THREE.PointLight(0xffffff, 100, 500);
+    const sunLight = new THREE.PointLight(0xffffff, 900, 500);
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
 
@@ -161,24 +163,41 @@ const SolarSystem = () => {
 
     planetsData.forEach((planetData) => {
       const geometryPlanet = new THREE.SphereGeometry(planetData.size, 32, 32);
+      const texturePlanet = new THREE.TextureLoader().load(planetData.texture);
       const materialPlanet = new THREE.MeshPhongMaterial({
-        map: textureLoader.load(planetData.texture),
+        map: texturePlanet,
       });
       const planet = new THREE.Mesh(geometryPlanet, materialPlanet);
 
-      const distanceAtPerihelion = planetData.distance * (1 - planetData.eccentricity);
-      planet.position.x = distanceAtPerihelion;
-      scene.add(planet);
-      planets.push({ mesh: planet, ...planetData });
+      const distanceAtPerihelion =
+        planetData.distance * (1 - planetData.eccentricity);
+      planet.position.set(
+        distanceAtPerihelion, // posición X calculada
+        planetData.position.y, // mantener Y desde planetData
+        planetData.position.z // mantener Z desde planetData
+      );
 
-      
+      scene.add(planet);
+
+      // Almacenar el planeta para interacción futura
+      planetData.mesh = planet;
+
+      // Añadir el planeta a la escena
+      planets.push({ mesh: planet, ...planetData });
 
       // Crear la órbita
       const curve = new THREE.EllipseCurve(
-        0, 0, planetData.distance * (1 + planetData.eccentricity),
-        planetData.distance * (1 - planetData.eccentricity), 0, 2 * Math.PI, false,
+        0,
+        0,
+        planetData.distance * (1 + planetData.eccentricity),
+        planetData.distance * (1 - planetData.eccentricity),
+        0,
+        2 * Math.PI,
+        false,
         THREE.MathUtils.degToRad(planetData.inclination)
       );
+
+      setPlanets(planetsArray);
 
       const points = curve.getPoints(50);
       const orbitGeometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -210,13 +229,15 @@ const SolarSystem = () => {
         ring.rotation.x = THREE.MathUtils.degToRad(90);
         planet.add(ring);
       }
+      planetsArray.push({ mesh: planet, ...planetData });
     });
 
-    camera.position.z = 150;
+    setPlanets(planetsArray);
+    camera.position.set(0, 0, 150);
 
     const animate = () => {
       requestAnimationFrame(animate);
-    
+
       planets.forEach(({ mesh, distance, eccentricity, orbitalPeriod }) => {
         // Convertir el período orbital en un factor de velocidad
         const time = Date.now() * 0.0001 * speedMultiplier;
@@ -224,22 +245,23 @@ const SolarSystem = () => {
         const angle = time * orbitalSpeed; // Angulo basado en la velocidad orbital y el tiempo
         const radiusX = distance * (1 + eccentricity);
         const radiusY = distance * (1 - eccentricity);
-    
+
         mesh.position.x = radiusX * Math.cos(angle);
         mesh.position.z = radiusY * Math.sin(angle);
-    
+
         // Rotación del planeta
         mesh.rotation.y += 0.01 * speedMultiplier;
       });
-    
+
+      TWEEN.update(performance.now());
       controls.update();
       renderer.render(scene, camera);
     };
-    
+
     animate();
 
     // Funcion para determinar la escala de tiempo basada en la velocidad
-    
+
     return () => {
       if (currentMountRef) {
         currentMountRef.removeChild(renderer.domElement);
@@ -248,20 +270,134 @@ const SolarSystem = () => {
     };
   }, [speedMultiplier]);
 
+  const zoomInToPlanet = (planet) => {
+    if (!planet) return;
+    setSelectedPlanet(planet);
+
+    new TWEEN.Tween(camera.position)
+      .to(
+        {
+          x: -window.innerWidth / 4, // Posicionar el planeta en la mitad izquierda
+          y: planet.mesh.position.y,
+          z: planet.size * 5,
+        },
+        1500
+      )
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start();
+  };
+
+  const zoomOutToSolarSystem = () => {
+    setSelectedPlanet(null);
+    new TWEEN.Tween(camera.position)
+      .to(
+        {
+          x: cameraInitialPosition.x,
+          y: cameraInitialPosition.y,
+          z: cameraInitialPosition.z,
+        },
+        1500
+      )
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start();
+  };
+
   useEffect(() => {
     setTimeScaleLabel(determineTimeScale(speedMultiplier));
   }, [speedMultiplier]);
 
+  const handlePlanetClick = (planet) => {
+    setSelectedPlanet(planet);
+    
+    // Mover la cámara al planeta seleccionado, pero sin eliminarlo de la escena
+    const newCameraPosition = {
+      x: planet.mesh.position.x + planet.size * 5,
+      y: planet.mesh.position.y + planet.size * 5,
+      z: planet.mesh.position.z + planet.size * 5,
+    };
+
+    new TWEEN.Tween(camera.position)
+      .to(newCameraPosition, 2000)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .onUpdate(() => {
+        camera.lookAt(planet.mesh.position);
+      })
+      .start();
+  };
+
+  const resetCameraPosition = () => {
+    setSelectedPlanet(null);
+    
+    new TWEEN.Tween(camera.position)
+      .to(cameraInitialPosition, 2000)
+      .easing(TWEEN.Easing.Quadratic.InOut)
+      .start();
+  };
+
+  const animatePlanetAppearance = (planet) => {
+    planet.mesh.scale.set(0, 0, 0); // Hacer el planeta muy pequeño inicialmente
+
+    new TWEEN.Tween(planet.mesh.scale)
+      .to({ x: planet.size, y: planet.size, z: planet.size }, 1500) // Animar la escala hacia su tamaño real
+      .easing(TWEEN.Easing.Elastic.Out)
+      .start();
+  };
+
   return (
-    <div>
-      <div ref={mountRef}></div>
-      <div className="container">
-        <label>Velocidad del sistema solar (Tiempo simulado):</label>
-        <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{timeScaleLabel}</div>
+    <div className="solar-system">
+      <div
+        ref={mountRef}
+        className="threejs-container"
+        style={{ width: "100%", height: "100vh" }}
+      ></div>
+
+      {selectedPlanet && (
+        <div
+          className="planet-info"
+          style={{
+            position: "absolute",
+            right: "5%",
+            top: "20%",
+            width: "30%",
+            backgroundColor: "rgba(0, 0, 0, 0.7)", // Fondo negro semi-transparente
+            color: "white",
+            padding: "20px",
+            borderRadius: "10px",
+          }}
+        >
+          <h2 className="titleInfo">{selectedPlanet.name}</h2>
+          <p></p>
+          
+        </div>
+      )}
+
+      <div className="planet-buttons">
+        {planetsData.map((planet) => (
+          <button
+            key={planet.name}
+            className={`planet-button ${
+              selectedPlanet?.name === planet.name ? "zoom-in" : ""
+            }`}
+            onClick={() => handlePlanetClick(planet)}
+          >
+            {planet.name}
+          </button>
+        ))}
+        {selectedPlanet && (
+          <button onClick={resetCameraPosition} className="exit-button">
+            Back to space
+          </button>
+        )}
+      </div>
+      <div className="controls">
+        <label>Speed of the solar system (Simulated Time):</label>
+        <div style={{ fontSize: "20px", fontWeight: "bold", color: "white" }}>
+          {timeScaleLabel}
+        </div>
         <input
           type="range"
           min="1"
-          max="8760"  // Un año tiene 8760 horas
+          max="8760"
           step="1"
           value={speedMultiplier}
           onChange={(e) => setSpeedMultiplier(parseFloat(e.target.value))}
@@ -270,7 +406,5 @@ const SolarSystem = () => {
     </div>
   );
 };
-
-
 
 export default SolarSystem;

@@ -71,3 +71,188 @@ details {
   background-color: #ff4500;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #000;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+}
+
+.solar-system {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: space-between;
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Botones de planetas */
+.planet-buttons {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+}
+
+.titleInfo{
+  font-size: 1.5em !important ;
+  background-color: rgba(34, 38, 58, 0.8) !important;
+}
+
+.planet-buttons button, .exit-button {
+  margin: 5px 0;
+  padding: 10px 20px;
+  background-color: rgba(34, 38, 58, 0.8);
+  color: #e0e0e0;
+  border-radius: 8px;
+  border: 2px solid #5a5e7e;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: 'Space Mono', monospace;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.3s ease;
+}
+
+.planet-buttons button:hover, .exit-button:hover {
+  background-color: #3f445a;
+  color: #ffffff;
+  transform: translateY(-2px);
+  border-color: #ffffff;
+}
+
+.planet-buttons button:focus {
+  background-color: #313546; /* Cambia el color de fondo al hacer clic */
+  color: #ffffff;            /* Cambia el color del texto */
+  border-color: #ffffff;      /* Cambia el color del borde */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); /* Agrega una sombra */
+  outline: none; /* Elimina el contorno por defecto que aparece en algunos navegadores */
+}
+
+/* Información de planetas */
+.planet-info-container {
+  width: 25%;
+  height: 100vh;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  z-index: 999;
+  overflow-y: auto;
+}
+
+/* Panel de control */
+.controls {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+  z-index: 1000;
+}
+
+label {
+  font-size: 16px;
+  color: #ffffff;
+}
+
+/* Estilo para el control deslizante */
+input[type="range"] {
+  -webkit-appearance: none;
+  width: 200px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  outline: none;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+}
+
+/* Información de planetas con zoom */
+.planet-container {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.planet-info {
+  width: 50%;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  transition: transform 1s ease;
+}
+
+.zoom-in {
+  background-color: #2d3142; /* Cambia el color del fondo al ser seleccionado */
+  color: #ffffff;           /* Cambia el color del texto */
+  border-color: #ffffff;     /* Cambia el color del borde */
+  /* Puedes agregar más estilos según lo que desees, pero evita usar 'transform' */
+}
+
+
+
+/* Panel de información de planetas */
+.planet-info-panel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 300px;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  display: none;
+  overflow-y: auto;
+}
+
+.planet-info-panel.show {
+  display: block;
+}
+
+.planet-info-panel img {
+  max-width: 100%;
+  height: auto;
+  margin-top: 10px;
+}
+
+/* Panel de información adicional */
+.info-panel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 300px;
+  display: none;
+}
+
+.info-panel .planet-info {
+  display: block;
+}
+
+.info-panel p {
+  margin: 0;
+}

@@ -8,17 +8,19 @@ import saturnImg from '../source/saturn2d.png';
 import uranusImg from '../source/uranus2d.png';
 import neptuneImg from '../source/neptune2d.png';
 import sunImg from '../source/sun2d.png';
+import '../Presentacion.css'
+
 
 const imagenes = {
-  "El Sol": sunImg,
-  "Mercurio": mercuryImg,
+  "The Sun": sunImg,
+  "Mercury": mercuryImg,
   "Venus": venusImg,
-  "La Tierra": earthImg,
-  "Marte": marsImg,
-  "Júpiter": jupiterImg,
-  "Saturno": saturnImg,
-  "Urano": uranusImg,
-  "Neptuno": neptuneImg,
+  "Earth": earthImg,
+  "Mars": marsImg,
+  "Jupiter": jupiterImg,
+  "Saturn": saturnImg,
+  "Uranus": uranusImg,
+  "Neptune": neptuneImg,
 };
 
 function Planeta({ nombre }) {
